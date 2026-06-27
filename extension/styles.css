@@ -1,4 +1,4 @@
-/* ── GNS3 Dark Theme — Styles ──────────────────────────────── */
+/* ── GNS3 Theme — Styles ────────────────────────────────────── */
 
 :root {
   --bg-primary: #1a1a2e;
@@ -15,6 +15,19 @@
   --red: #ef5350;
   --font: 'Segoe UI', 'San Francisco', 'Helvetica Neue', Arial, sans-serif;
   --radius: 6px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #f0f2f5;
+    --bg-secondary: #e4e7eb;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --border: #d0d5dd;
+    --text-primary: #1a1a2e;
+    --text-secondary: #5a5a7a;
+    --text-muted: #9090a8;
+  }
 }
 
 * {
@@ -320,7 +333,7 @@ legend {
   color: var(--red);
 }
 
-/* ── Scrollbar (dark) ───────────────────────────────────────── */
+/* ── Scrollbar ──────────────────────────────────────────────── */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -333,4 +346,12 @@ legend {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
+}
+
+/* ── Light mode overrides ───────────────────────────────────── */
+
+@media (prefers-color-scheme: light) {
+  .btn-primary {
+    color: #fff;
+  }
 }
