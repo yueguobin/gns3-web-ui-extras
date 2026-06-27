@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "GNS3 Management Proxy",
+  "version": "1.0.0",
+  "description": "Route traffic to managed device IPs through the GNS3 CONNECT proxy (port 3090)",
+  "permissions": [
+    "proxy",
+    "webRequest",
+    "storage",
+    "webRequestAuthProvider"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GNS3 Proxy",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

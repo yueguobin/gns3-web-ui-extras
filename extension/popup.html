@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>GNS3 Proxy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="popup-body">
+  <div class="popup-container">
+    <div class="header">
+      <h1 class="logo">
+        <span class="logo-icon">&#9670;</span>
+        GNS3 <small>Proxy</small>
+      </h1>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">加载中…</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-row">
+        <span class="info-label">代理目标</span>
+        <span class="info-value" id="infoProxy">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">管理网段</span>
+        <span class="info-value" id="infoNetwork">—</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnToggle">启用代理</button>
+      <a href="options.html" class="btn btn-secondary" target="_blank">⚙ 配置</a>
+    </div>
+
+    <p class="footer-note">
+      仅管理网段内 IP 走代理，不影响正常上网。
+    </p>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

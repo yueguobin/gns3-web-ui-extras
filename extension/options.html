@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>GNS3 Proxy — 配置</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="options-body">
+  <div class="options-container">
+    <div class="header">
+      <h1 class="logo">
+        <span class="logo-icon">&#9670;</span>
+        GNS3 <small>Proxy 配置</small>
+      </h1>
+      <p class="subtitle">管理 GNS3 拓扑内设备的 Web 界面代理</p>
+    </div>
+
+    <form id="configForm">
+      <!-- Server -->
+      <fieldset>
+        <legend>GNS3 Server 连接</legend>
+
+        <div class="field">
+          <label for="proxyHost">Server 地址</label>
+          <input type="text" id="proxyHost" placeholder="127.0.0.1" />
+          <span class="hint">gns3server 的主机名或 IP 地址</span>
+        </div>
+
+        <div class="field">
+          <label for="proxyPort">代理端口</label>
+          <input type="number" id="proxyPort" placeholder="3090" min="1" max="65535" />
+          <span class="hint">CONNECT 代理端口，默认 3090</span>
+        </div>
+      </fieldset>
+
+      <!-- Network -->
+      <fieldset>
+        <legend>管理网段</legend>
+
+        <div class="field">
+          <label for="mgmtNetwork">IP 地址</label>
+          <input type="text" id="mgmtNetwork" placeholder="172.16.40.0" />
+          <span class="hint">触发代理的网段起始 IP</span>
+        </div>
+
+        <div class="field">
+          <label for="mgmtCidr">子网前缀</label>
+          <input type="number" id="mgmtCidr" placeholder="23" min="0" max="32" />
+          <span class="hint">CIDR 前缀长度（如 /23），仅此段 IP 走代理</span>
+        </div>
+
+        <div class="field readonly">
+          <label>子网掩码</label>
+          <span id="maskDisplay">255.255.254.0</span>
+        </div>
+      </fieldset>
+
+      <!-- Credentials -->
+      <fieldset>
+        <legend>代理认证凭据</legend>
+        <p class="fieldset-desc">使用 GNS3 Web UI 的登录用户名密码</p>
+
+        <div class="field">
+          <label for="proxyUser">用户名</label>
+          <input type="text" id="proxyUser" placeholder="admin" />
+        </div>
+
+        <div class="field">
+          <label for="proxyPass">密码</label>
+          <input type="password" id="proxyPass" placeholder="输入密码" />
+          <button type="button" class="btn btn-small" id="btnTogglePass">显示</button>
+          <span class="hint">密码保存在浏览器本地存储中</span>
+        </div>
+      </fieldset>
+
+      <!-- Controls -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">保存配置</button>
+        <button type="button" class="btn btn-secondary" id="btnReset">恢复默认</button>
+      </div>
+
+      <div id="saveStatus" class="save-status" aria-live="polite"></div>
+    </form>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
