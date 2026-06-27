@@ -16,11 +16,12 @@ const _ = chrome.i18n.getMessage.bind(chrome.i18n);
 // ── Helpers ───────────────────────────────────────────────────────
 
 function isValidIPv4(s) {
-  const parts = String(s).split('.').map(Number);
-  return (
-    parts.length === 4 &&
-    parts.every((p) => !isNaN(p) && p >= 0 && p <= 255 && String(p) === parts)
-  );
+  const parts = String(s).split('.');
+  if (parts.length !== 4) return false;
+  return parts.every((part) => {
+    const n = Number(part);
+    return !isNaN(n) && n >= 0 && n <= 255 && String(n) === part;
+  });
 }
 
 function cidrToMask(prefix) {
