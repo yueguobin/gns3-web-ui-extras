@@ -2,40 +2,41 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <title>__MSG_appName__</title>
+  <title data-i18n="appName">GNS3 Management Proxy</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js"></script>
 </head>
 <body class="popup-body">
   <div class="popup-container">
     <div class="header">
       <h1 class="logo">
         <span class="logo-icon">&#9670;</span>
-        __MSG_appName__
+        <span data-i18n="appName">GNS3 Management Proxy</span>
       </h1>
     </div>
 
     <div class="status-bar" id="statusBar">
       <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">__MSG_loading__</span>
+      <span id="statusText">Loading…</span>
     </div>
 
     <div class="info-grid">
       <div class="info-row">
-        <span class="info-label">__MSG_labelProxyTarget__</span>
+        <span class="info-label" data-i18n="labelProxyTarget">Proxy Target</span>
         <span class="info-value" id="infoProxy">—</span>
       </div>
       <div class="info-row">
-        <span class="info-label">__MSG_labelMgmtNetwork__</span>
+        <span class="info-label" data-i18n="labelMgmtNetwork">Management Network</span>
         <span class="info-value" id="infoNetwork">—</span>
       </div>
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="btnToggle">__MSG_actionEnable__</button>
-      <a href="options.html" class="btn btn-secondary" target="_blank">⚙ __MSG_configLink__</a>
+      <button class="btn btn-primary" id="btnToggle">Enable Proxy</button>
+      <a href="options.html" class="btn btn-secondary" target="_blank">⚙ <span data-i18n="configLink">Settings</span></a>
     </div>
 
-    <p class="footer-note">__MSG_footerNote__</p>
+    <p class="footer-note" data-i18n="footerNote">Only management subnet traffic goes through the proxy.</p>
   </div>
   <script src="popup.js"></script>
 </body>

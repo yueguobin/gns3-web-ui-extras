@@ -2,75 +2,76 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <title>__MSG_configTitle__</title>
+  <title data-i18n="configTitle">GNS3 Proxy Settings</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js"></script>
 </head>
 <body class="options-body">
   <div class="options-container">
     <div class="header">
       <h1 class="logo">
         <span class="logo-icon">&#9670;</span>
-        __MSG_configTitle__
+        <span data-i18n-html data-i18n="configTitle">GNS3 <small>Proxy Settings</small></span>
       </h1>
-      <p class="subtitle">__MSG_configSubtitle__</p>
+      <p class="subtitle" data-i18n="configSubtitle">Manage web UI proxy for devices in GNS3 topologies</p>
     </div>
 
     <form id="configForm">
       <!-- Server -->
       <fieldset>
-        <legend>__MSG_sectionServer__</legend>
+        <legend data-i18n="sectionServer">GNS3 Server Connection</legend>
 
         <div class="field">
-          <label for="proxyHost">__MSG_fieldServerAddr__</label>
-          <input type="text" id="proxyHost" placeholder="__MSG_phServerAddr__" />
-          <span class="hint">__MSG_hintServerAddr__</span>
+          <label for="proxyHost" data-i18n="fieldServerAddr">Server Address</label>
+          <input type="text" id="proxyHost" data-i18n-attr="placeholder" data-i18n="phServerAddr" />
+          <span class="hint" data-i18n="hintServerAddr">Hostname or IP of the gns3server</span>
         </div>
 
         <div class="field">
-          <label for="proxyPort">__MSG_fieldPort__</label>
-          <input type="number" id="proxyPort" placeholder="__MSG_phPort__" min="1" max="65535" />
-          <span class="hint">__MSG_hintPort__</span>
+          <label for="proxyPort" data-i18n="fieldPort">Proxy Port</label>
+          <input type="number" id="proxyPort" data-i18n-attr="placeholder" data-i18n="phPort" min="1" max="65535" />
+          <span class="hint" data-i18n="hintPort">CONNECT proxy port, default 3090</span>
         </div>
       </fieldset>
 
       <!-- Network -->
       <fieldset>
-        <legend>__MSG_sectionNetwork__</legend>
+        <legend data-i18n="sectionNetwork">Management Network</legend>
 
         <div class="field">
-          <label for="mgmtCidr">__MSG_fieldCidr__</label>
-          <input type="text" id="mgmtCidr" placeholder="__MSG_phCidr__" />
-          <span class="hint">__MSG_hintCidr__</span>
+          <label for="mgmtCidr" data-i18n="fieldCidr">CIDR Network</label>
+          <input type="text" id="mgmtCidr" data-i18n-attr="placeholder" data-i18n="phCidr" />
+          <span class="hint" data-i18n="hintCidr">Format: network/prefix (e.g. 172.16.40.0/23)</span>
         </div>
 
         <div class="field readonly">
-          <label>__MSG_fieldMask__</label>
+          <label data-i18n="fieldMask">Subnet Mask</label>
           <span id="maskDisplay">—</span>
         </div>
       </fieldset>
 
       <!-- Credentials -->
       <fieldset>
-        <legend>__MSG_sectionCredentials__</legend>
-        <p class="fieldset-desc">__MSG_sectionCredentialsDesc__</p>
+        <legend data-i18n="sectionCredentials">Proxy Authentication</legend>
+        <p class="fieldset-desc" data-i18n="sectionCredentialsDesc">Use your GNS3 Web UI login credentials</p>
 
         <div class="field">
-          <label for="proxyUser">__MSG_fieldUsername__</label>
-          <input type="text" id="proxyUser" placeholder="__MSG_phUsername__" />
+          <label for="proxyUser" data-i18n="fieldUsername">Username</label>
+          <input type="text" id="proxyUser" data-i18n-attr="placeholder" data-i18n="phUsername" />
         </div>
 
         <div class="field">
-          <label for="proxyPass">__MSG_fieldPassword__</label>
-          <input type="password" id="proxyPass" placeholder="__MSG_phPassword__" />
-          <button type="button" class="btn btn-small" id="btnTogglePass">__MSG_btnShow__</button>
-          <span class="hint">__MSG_hintPassword__</span>
+          <label for="proxyPass" data-i18n="fieldPassword">Password</label>
+          <input type="password" id="proxyPass" data-i18n-attr="placeholder" data-i18n="phPassword" />
+          <button type="button" class="btn btn-small" id="btnTogglePass" data-i18n="btnShow">Show</button>
+          <span class="hint" data-i18n="hintPassword">Password is stored in local storage</span>
         </div>
       </fieldset>
 
       <!-- Controls -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">__MSG_btnSave__</button>
-        <button type="button" class="btn btn-secondary" id="btnReset">__MSG_btnReset__</button>
+        <button type="submit" class="btn btn-primary" data-i18n="btnSave">Save Settings</button>
+        <button type="button" class="btn btn-secondary" id="btnReset" data-i18n="btnReset">Restore Defaults</button>
       </div>
 
       <div id="saveStatus" class="save-status" aria-live="polite"></div>
