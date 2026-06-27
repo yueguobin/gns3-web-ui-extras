@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const parts = String(mask).split('.').map(Number);
     if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return '';
     const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-    return bin === 0 ? '0' : String(32 - Math.clz32(bin));
+    return bin === 0 ? '0' : String(Math.clz32((~bin) >>> 0));
   }
 
   // Load current config

@@ -38,7 +38,7 @@ function maskToCidr(mask) {
   const parts = String(mask).split('.').map(Number);
   if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
   const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-  return bin === 0 ? 0 : 32 - Math.clz32(bin);
+  return Math.clz32((~bin) >>> 0);
 }
 
 /**
