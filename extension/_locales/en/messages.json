@@ -1,0 +1,57 @@
+{
+  "appName":                    { "message": "GNS3 Management Proxy" },
+  "appDesc":                    { "message": "Route traffic to managed device IPs through the GNS3 CONNECT proxy" },
+
+  "configTitle":                { "message": "GNS3 <small>Proxy Settings</small>" },
+  "configLink":                 { "message": "Settings" },
+  "configSubtitle":             { "message": "Manage web UI proxy for devices in GNS3 topologies" },
+
+  "sectionServer":              { "message": "GNS3 Server Connection" },
+  "sectionNetwork":             { "message": "Management Network" },
+  "sectionCredentials":         { "message": "Proxy Authentication Credentials" },
+  "sectionCredentialsDesc":     { "message": "Use your GNS3 Web UI login credentials" },
+
+  "fieldServerAddr":            { "message": "Server Address" },
+  "fieldPort":                  { "message": "Proxy Port" },
+  "fieldCidr":                  { "message": "CIDR Network" },
+  "fieldMask":                  { "message": "Subnet Mask" },
+  "fieldUsername":              { "message": "Username" },
+  "fieldPassword":              { "message": "Password" },
+
+  "hintServerAddr":             { "message": "Hostname or IP of the gns3server" },
+  "hintPort":                   { "message": "CONNECT proxy port, default 3090" },
+  "hintCidr":                   { "message": "Format: network/prefix (e.g. 172.16.40.0/23). Only this subnet uses the proxy" },
+  "hintPassword":               { "message": "Password is stored in browser local storage" },
+
+  "phServerAddr":               { "message": "127.0.0.1" },
+  "phPort":                     { "message": "3090" },
+  "phCidr":                     { "message": "172.16.40.0/23" },
+  "phUsername":                 { "message": "admin" },
+  "phPassword":                 { "message": "Enter password" },
+
+  "btnSave":                    { "message": "Save Settings" },
+  "btnReset":                   { "message": "Restore Defaults" },
+  "btnShow":                    { "message": "Show" },
+  "btnHide":                    { "message": "Hide" },
+
+  "statusEnabled":              { "message": "Proxy Enabled" },
+  "statusDisabled":             { "message": "Proxy Disabled" },
+  "actionEnable":               { "message": "Enable Proxy" },
+  "actionDisable":              { "message": "Disable Proxy" },
+
+  "labelProxyTarget":           { "message": "Proxy Target" },
+  "labelMgmtNetwork":           { "message": "Network" },
+
+  "footerNote":                 { "message": "Only management subnet traffic goes through the proxy. Normal browsing is unaffected." },
+
+  "loading":                    { "message": "Loading…" },
+
+  "errServerEmpty":             { "message": "Server address cannot be empty" },
+  "errPortRange":               { "message": "Port must be between 1 and 65535" },
+  "errCidrFormat":              { "message": "Invalid CIDR format (e.g. 172.16.40.0/23)" },
+  "errUserEmpty":               { "message": "Username cannot be empty" },
+
+  "msgSaveSuccess":             { "message": "Settings saved. Proxy rules updated." },
+  "msgSaveFail":                { "message": "Save failed" },
+  "msgResetDone":               { "message": "Defaults restored." }
+}

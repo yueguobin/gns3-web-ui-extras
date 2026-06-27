@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <title>GNS3 Proxy</title>
+  <title>__MSG_appName__</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="popup-body">
@@ -10,34 +10,32 @@
     <div class="header">
       <h1 class="logo">
         <span class="logo-icon">&#9670;</span>
-        GNS3 <small>Proxy</small>
+        __MSG_appName__
       </h1>
     </div>
 
     <div class="status-bar" id="statusBar">
       <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">加载中…</span>
+      <span id="statusText">__MSG_loading__</span>
     </div>
 
     <div class="info-grid">
       <div class="info-row">
-        <span class="info-label">代理目标</span>
+        <span class="info-label">__MSG_labelProxyTarget__</span>
         <span class="info-value" id="infoProxy">—</span>
       </div>
       <div class="info-row">
-        <span class="info-label">管理网段</span>
+        <span class="info-label">__MSG_labelMgmtNetwork__</span>
         <span class="info-value" id="infoNetwork">—</span>
       </div>
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="btnToggle">启用代理</button>
-      <a href="options.html" class="btn btn-secondary" target="_blank">⚙ 配置</a>
+      <button class="btn btn-primary" id="btnToggle">__MSG_actionEnable__</button>
+      <a href="options.html" class="btn btn-secondary" target="_blank">⚙ __MSG_configLink__</a>
     </div>
 
-    <p class="footer-note">
-      仅管理网段内 IP 走代理，不影响正常上网。
-    </p>
+    <p class="footer-note">__MSG_footerNote__</p>
   </div>
   <script src="popup.js"></script>
 </body>

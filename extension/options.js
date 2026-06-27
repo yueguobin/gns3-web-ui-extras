@@ -11,6 +11,8 @@ const DEFAULTS = {
   enabled: false,
 };
 
+const _ = chrome.i18n.getMessage.bind(chrome.i18n);
+
 // ── Helpers ───────────────────────────────────────────────────────
 
 function isValidIPv4(s) {
@@ -31,8 +33,15 @@ function cidrToMask(prefix) {
   ].join('.');
 }
 
+function maskToCidr(mask) {
+  const parts = String(mask).split('.').map(Number);
+  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
+  const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
+  return bin === 0 ? 0 : 32 - Math.clz32(bin);
+}
+
 /**
- * Parse "172.16.40.0/23" → { network: "172.16.40.0", prefix: 23, mask: "255.255.254.0" }
+ * Parse "172.16.40.0/23" → { network, prefix, mask }
  * Returns null on invalid input.
  */
 function parseCidr(input) {
@@ -68,9 +77,7 @@ function loadConfig() {
     proxyUser.value = data.proxyUser || DEFAULTS.proxyUser;
     proxyPass.value = data.proxyPass || '';
 
-    // Build CIDR display string from stored mgmtNetwork + mgmtCidr
     if (data.mgmtCidr && String(data.mgmtCidr).includes('/')) {
-      // Already stored as CIDR string
       mgmtCidr.value = data.mgmtCidr;
     } else {
       const net = data.mgmtNetwork || DEFAULTS.mgmtNetwork;
@@ -79,13 +86,6 @@ function loadConfig() {
     }
     updateMaskDisplay();
   });
-}
-
-function maskToCidr(mask) {
-  const parts = String(mask).split('.').map(Number);
-  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
-  const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-  return bin === 0 ? 0 : 32 - Math.clz32(bin);
 }
 
 // ── Update mask display on input ──────────────────────────────────
@@ -109,10 +109,10 @@ function saveConfig(e) {
   const pass = proxyPass.value;
 
   const errors = [];
-  if (!host) errors.push('Server 地址不能为空');
-  if (isNaN(port) || port < 1 || port > 65535) errors.push('端口需在 1-65535 之间');
-  if (!cidrParsed) errors.push('管理网段格式不正确（例: 172.16.40.0/23）');
-  if (!user) errors.push('用户名不能为空');
+  if (!host) errors.push(_('errServerEmpty'));
+  if (isNaN(port) || port < 1 || port > 65535) errors.push(_('errPortRange'));
+  if (!cidrParsed) errors.push(_('errCidrFormat'));
+  if (!user) errors.push(_('errUserEmpty'));
 
   if (errors.length) {
     showStatus(errors.join('<br>'), 'error');
@@ -131,9 +131,9 @@ function saveConfig(e) {
     },
     () => {
       if (chrome.runtime.lastError) {
-        showStatus('保存失败: ' + chrome.runtime.lastError.message, 'error');
+        showStatus(_('msgSaveFail') + ': ' + chrome.runtime.lastError.message, 'error');
       } else {
-        showStatus('配置已保存，代理规则已更新。', 'success');
+        showStatus(_('msgSaveSuccess'), 'success');
       }
     },
   );
@@ -144,7 +144,7 @@ function saveConfig(e) {
 function resetConfig() {
   chrome.storage.local.set(DEFAULTS, () => {
     loadConfig();
-    showStatus('已恢复默认配置。', 'success');
+    showStatus(_('msgResetDone'), 'success');
   });
 }
 
@@ -164,7 +164,7 @@ function showStatus(msg, type) {
 btnTogglePass.addEventListener('click', () => {
   const isPassword = proxyPass.type === 'password';
   proxyPass.type = isPassword ? 'text' : 'password';
-  btnTogglePass.textContent = isPassword ? '隐藏' : '显示';
+  btnTogglePass.textContent = isPassword ? _('btnHide') : _('btnShow');
 });
 
 // ── Events ───────────────────────────────────────────────────────

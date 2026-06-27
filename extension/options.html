@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <title>GNS3 Proxy — 配置</title>
+  <title>__MSG_configTitle__</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="options-body">
@@ -10,67 +10,67 @@
     <div class="header">
       <h1 class="logo">
         <span class="logo-icon">&#9670;</span>
-        GNS3 <small>Proxy 配置</small>
+        __MSG_configTitle__
       </h1>
-      <p class="subtitle">管理 GNS3 拓扑内设备的 Web 界面代理</p>
+      <p class="subtitle">__MSG_configSubtitle__</p>
     </div>
 
     <form id="configForm">
       <!-- Server -->
       <fieldset>
-        <legend>GNS3 Server 连接</legend>
+        <legend>__MSG_sectionServer__</legend>
 
         <div class="field">
-          <label for="proxyHost">Server 地址</label>
-          <input type="text" id="proxyHost" placeholder="127.0.0.1" />
-          <span class="hint">gns3server 的主机名或 IP 地址</span>
+          <label for="proxyHost">__MSG_fieldServerAddr__</label>
+          <input type="text" id="proxyHost" placeholder="__MSG_phServerAddr__" />
+          <span class="hint">__MSG_hintServerAddr__</span>
         </div>
 
         <div class="field">
-          <label for="proxyPort">代理端口</label>
-          <input type="number" id="proxyPort" placeholder="3090" min="1" max="65535" />
-          <span class="hint">CONNECT 代理端口，默认 3090</span>
+          <label for="proxyPort">__MSG_fieldPort__</label>
+          <input type="number" id="proxyPort" placeholder="__MSG_phPort__" min="1" max="65535" />
+          <span class="hint">__MSG_hintPort__</span>
         </div>
       </fieldset>
 
       <!-- Network -->
       <fieldset>
-        <legend>管理网段</legend>
+        <legend>__MSG_sectionNetwork__</legend>
 
         <div class="field">
-          <label for="mgmtCidr">CIDR 网段</label>
-          <input type="text" id="mgmtCidr" placeholder="172.16.40.0/23" />
-          <span class="hint">格式：网络地址/前缀长度（如 172.16.40.0/23），仅此段 IP 走代理</span>
+          <label for="mgmtCidr">__MSG_fieldCidr__</label>
+          <input type="text" id="mgmtCidr" placeholder="__MSG_phCidr__" />
+          <span class="hint">__MSG_hintCidr__</span>
         </div>
 
         <div class="field readonly">
-          <label>子网掩码</label>
-          <span id="maskDisplay">255.255.254.0</span>
+          <label>__MSG_fieldMask__</label>
+          <span id="maskDisplay">—</span>
         </div>
       </fieldset>
 
       <!-- Credentials -->
       <fieldset>
-        <legend>代理认证凭据</legend>
-        <p class="fieldset-desc">使用 GNS3 Web UI 的登录用户名密码</p>
+        <legend>__MSG_sectionCredentials__</legend>
+        <p class="fieldset-desc">__MSG_sectionCredentialsDesc__</p>
 
         <div class="field">
-          <label for="proxyUser">用户名</label>
-          <input type="text" id="proxyUser" placeholder="admin" />
+          <label for="proxyUser">__MSG_fieldUsername__</label>
+          <input type="text" id="proxyUser" placeholder="__MSG_phUsername__" />
         </div>
 
         <div class="field">
-          <label for="proxyPass">密码</label>
-          <input type="password" id="proxyPass" placeholder="输入密码" />
-          <button type="button" class="btn btn-small" id="btnTogglePass">显示</button>
-          <span class="hint">密码保存在浏览器本地存储中</span>
+          <label for="proxyPass">__MSG_fieldPassword__</label>
+          <input type="password" id="proxyPass" placeholder="__MSG_phPassword__" />
+          <button type="button" class="btn btn-small" id="btnTogglePass">__MSG_btnShow__</button>
+          <span class="hint">__MSG_hintPassword__</span>
         </div>
       </fieldset>
 
       <!-- Controls -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">保存配置</button>
-        <button type="button" class="btn btn-secondary" id="btnReset">恢复默认</button>
+        <button type="submit" class="btn btn-primary">__MSG_btnSave__</button>
+        <button type="button" class="btn btn-secondary" id="btnReset">__MSG_btnReset__</button>
       </div>
 
       <div id="saveStatus" class="save-status" aria-live="polite"></div>

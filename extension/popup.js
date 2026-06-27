@@ -11,8 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const enabled = !!config.enabled;
 
     statusDot.className = 'status-dot' + (enabled ? ' active' : '');
-    statusText.textContent = enabled ? '代理已启用' : '代理已关闭';
-    btnToggle.textContent = enabled ? '禁用代理' : '启用代理';
+    statusText.textContent = enabled
+      ? chrome.i18n.getMessage('statusEnabled')
+      : chrome.i18n.getMessage('statusDisabled');
+    btnToggle.textContent = enabled
+      ? chrome.i18n.getMessage('actionDisable')
+      : chrome.i18n.getMessage('actionEnable');
 
     infoProxy.textContent = enabled
       ? `${config.proxyHost || '127.0.0.1'}:${config.proxyPort || 3090}`
@@ -47,18 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Toggle proxy
   btnToggle.addEventListener('click', () => {
-    chrome.storage.local.get(['enabled', 'proxyHost', 'proxyPort', 'mgmtCidr', 'mgmtNetwork', 'mgmtMask'], (data) => {
-      const newState = !data.enabled;
-      chrome.storage.local.set({ enabled: newState }, () => {
-        updateUI({
-          enabled: newState,
-          proxyHost: data.proxyHost || '127.0.0.1',
-          proxyPort: data.proxyPort || 3090,
-          mgmtCidr: data.mgmtCidr,
-          mgmtNetwork: data.mgmtNetwork || '172.16.40.0',
-          mgmtMask: data.mgmtMask || '255.255.254.0',
+    chrome.storage.local.get(
+      ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidr', 'mgmtNetwork', 'mgmtMask'],
+      (data) => {
+        const newState = !data.enabled;
+        chrome.storage.local.set({ enabled: newState }, () => {
+          updateUI({
+            enabled: newState,
+            proxyHost: data.proxyHost || '127.0.0.1',
+            proxyPort: data.proxyPort || 3090,
+            mgmtCidr: data.mgmtCidr,
+            mgmtNetwork: data.mgmtNetwork || '172.16.40.0',
+            mgmtMask: data.mgmtMask || '255.255.254.0',
+          });
         });
-      });
-    });
+      },
+    );
   });
 });

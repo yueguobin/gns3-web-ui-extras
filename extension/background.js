@@ -108,9 +108,10 @@ function loadAndApplyConfig() {
       ...stored,
     };
 
-    // If mgmtMask wasn't stored explicitly but mgmtCidr was, compute mask
+    // Fallback: derive mask from CIDR string if mask wasn't stored
     if (stored.mgmtCidr && !stored.mgmtMask) {
-      currentConfig.mgmtMask = cidrToMask(parseInt(stored.mgmtCidr, 10));
+      const m = String(stored.mgmtCidr).match(/\/(\d+)$/);
+      if (m) currentConfig.mgmtMask = cidrToMask(parseInt(m[1], 10));
     }
 
     applyProxy(currentConfig);
@@ -131,11 +132,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
   }
 
-  // Support mgmtCidr → mgmtMask conversion on change
-  if (changes.mgmtCidr) {
-    const cidr = parseInt(changes.mgmtCidr.newValue, 10);
-    if (!isNaN(cidr)) {
-      currentConfig.mgmtMask = cidrToMask(cidr);
+  // If mgmtCidr changed but mgmtMask didn't, derive mask from CIDR string
+  if (changes.mgmtCidr && !changes.mgmtMask) {
+    const m = String(changes.mgmtCidr.newValue).match(/\/(\d+)$/);
+    if (m) {
+      currentConfig.mgmtMask = cidrToMask(parseInt(m[1], 10));
       changed = true;
     }
   }
