@@ -3,8 +3,8 @@
 const DEFAULTS = {
   proxyHost: '127.0.0.1',
   proxyPort: 3090,
+  mgmtCidr: '172.16.40.0/23',
   mgmtNetwork: '172.16.40.0',
-  mgmtCidr: 23,
   mgmtMask: '255.255.254.0',
   proxyUser: 'admin',
   proxyPass: '',
@@ -12,6 +12,14 @@ const DEFAULTS = {
 };
 
 // ── Helpers ───────────────────────────────────────────────────────
+
+function isValidIPv4(s) {
+  const parts = String(s).split('.').map(Number);
+  return (
+    parts.length === 4 &&
+    parts.every((p) => !isNaN(p) && p >= 0 && p <= 255 && String(p) === parts)
+  );
+}
 
 function cidrToMask(prefix) {
   const mask = ~0 << (32 - Math.min(Math.max(prefix, 0), 32));
@@ -23,16 +31,18 @@ function cidrToMask(prefix) {
   ].join('.');
 }
 
-function maskToCidr(mask) {
-  const parts = mask.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
-  const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-  return bin === 0 ? 0 : 32 - Math.clz32(bin);
-}
-
-function isValidIPv4(s) {
-  const parts = s.split('.').map(Number);
-  return parts.length === 4 && parts.every((p) => !isNaN(p) && p >= 0 && p <= 255 && String(p) === parts);
+/**
+ * Parse "172.16.40.0/23" → { network: "172.16.40.0", prefix: 23, mask: "255.255.254.0" }
+ * Returns null on invalid input.
+ */
+function parseCidr(input) {
+  const s = String(input).trim();
+  const m = s.match(/^([\d.]+)\/(\d+)$/);
+  if (!m) return null;
+  const network = m[1];
+  const prefix = parseInt(m[2], 10);
+  if (!isValidIPv4(network) || prefix < 0 || prefix > 32) return null;
+  return { network, prefix, mask: cidrToMask(prefix) };
 }
 
 // ── DOM refs ──────────────────────────────────────────────────────
@@ -40,7 +50,6 @@ function isValidIPv4(s) {
 const $ = (id) => document.getElementById(id);
 const proxyHost = $('proxyHost');
 const proxyPort = $('proxyPort');
-const mgmtNetwork = $('mgmtNetwork');
 const mgmtCidr = $('mgmtCidr');
 const maskDisplay = $('maskDisplay');
 const proxyUser = $('proxyUser');
@@ -56,27 +65,34 @@ function loadConfig() {
   chrome.storage.local.get(Object.keys(DEFAULTS), (data) => {
     proxyHost.value = data.proxyHost || DEFAULTS.proxyHost;
     proxyPort.value = data.proxyPort || DEFAULTS.proxyPort;
-    mgmtNetwork.value = data.mgmtNetwork || DEFAULTS.mgmtNetwork;
     proxyUser.value = data.proxyUser || DEFAULTS.proxyUser;
     proxyPass.value = data.proxyPass || '';
 
-    // Compute CIDR from stored mask or use default
-    let cidr = maskToCidr(data.mgmtMask || DEFAULTS.mgmtMask);
-    if (data.mgmtCidr !== undefined) cidr = parseInt(data.mgmtCidr, 10);
-    mgmtCidr.value = isNaN(cidr) ? DEFAULTS.mgmtCidr : cidr;
+    // Build CIDR display string from stored mgmtNetwork + mgmtCidr
+    if (data.mgmtCidr && String(data.mgmtCidr).includes('/')) {
+      // Already stored as CIDR string
+      mgmtCidr.value = data.mgmtCidr;
+    } else {
+      const net = data.mgmtNetwork || DEFAULTS.mgmtNetwork;
+      const pre = data.mgmtCidr || maskToCidr(data.mgmtMask || DEFAULTS.mgmtMask);
+      mgmtCidr.value = `${net}/${pre}`;
+    }
     updateMaskDisplay();
   });
 }
 
-// ── Update mask display when CIDR changes ─────────────────────────
+function maskToCidr(mask) {
+  const parts = String(mask).split('.').map(Number);
+  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
+  const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
+  return bin === 0 ? 0 : 32 - Math.clz32(bin);
+}
+
+// ── Update mask display on input ──────────────────────────────────
 
 function updateMaskDisplay() {
-  const cidr = parseInt(mgmtCidr.value, 10);
-  if (!isNaN(cidr) && cidr >= 0 && cidr <= 32) {
-    maskDisplay.textContent = cidrToMask(cidr);
-  } else {
-    maskDisplay.textContent = '—';
-  }
+  const parsed = parseCidr(mgmtCidr.value);
+  maskDisplay.textContent = parsed ? parsed.mask : '—';
 }
 
 mgmtCidr.addEventListener('input', updateMaskDisplay);
@@ -86,19 +102,16 @@ mgmtCidr.addEventListener('input', updateMaskDisplay);
 function saveConfig(e) {
   e.preventDefault();
 
-  // Validate
   const host = proxyHost.value.trim();
   const port = parseInt(proxyPort.value, 10);
-  const network = mgmtNetwork.value.trim();
-  const cidr = parseInt(mgmtCidr.value, 10);
+  const cidrParsed = parseCidr(mgmtCidr.value);
   const user = proxyUser.value.trim();
   const pass = proxyPass.value;
 
   const errors = [];
   if (!host) errors.push('Server 地址不能为空');
   if (isNaN(port) || port < 1 || port > 65535) errors.push('端口需在 1-65535 之间');
-  if (!isValidIPv4(network)) errors.push('管理网段 IP 格式不正确 (例: 172.16.40.0)');
-  if (isNaN(cidr) || cidr < 0 || cidr > 32) errors.push('子网前缀需在 0-32 之间');
+  if (!cidrParsed) errors.push('管理网段格式不正确（例: 172.16.40.0/23）');
   if (!user) errors.push('用户名不能为空');
 
   if (errors.length) {
@@ -106,15 +119,13 @@ function saveConfig(e) {
     return;
   }
 
-  const mask = cidrToMask(cidr);
-
   chrome.storage.local.set(
     {
       proxyHost: host,
       proxyPort: port,
-      mgmtNetwork: network,
-      mgmtCidr: cidr,
-      mgmtMask: mask,
+      mgmtCidr: mgmtCidr.value.trim(),
+      mgmtNetwork: cidrParsed.network,
+      mgmtMask: cidrParsed.mask,
       proxyUser: user,
       proxyPass: pass,
     },

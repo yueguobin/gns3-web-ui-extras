@@ -38,15 +38,9 @@
         <legend>管理网段</legend>
 
         <div class="field">
-          <label for="mgmtNetwork">IP 地址</label>
-          <input type="text" id="mgmtNetwork" placeholder="172.16.40.0" />
-          <span class="hint">触发代理的网段起始 IP</span>
-        </div>
-
-        <div class="field">
-          <label for="mgmtCidr">子网前缀</label>
-          <input type="number" id="mgmtCidr" placeholder="23" min="0" max="32" />
-          <span class="hint">CIDR 前缀长度（如 /23），仅此段 IP 走代理</span>
+          <label for="mgmtCidr">CIDR 网段</label>
+          <input type="text" id="mgmtCidr" placeholder="172.16.40.0/23" />
+          <span class="hint">格式：网络地址/前缀长度（如 172.16.40.0/23），仅此段 IP 走代理</span>
         </div>
 
         <div class="field readonly">

@@ -3,6 +3,7 @@
 const DEFAULT_CONFIG = {
   proxyHost: '127.0.0.1',
   proxyPort: 3090,
+  mgmtCidr: '172.16.40.0/23',
   mgmtNetwork: '172.16.40.0',
   mgmtMask: '255.255.254.0',
   proxyUser: 'admin',
