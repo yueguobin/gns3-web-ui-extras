@@ -11,7 +11,8 @@ const DEFAULTS = {
   enabled: false,
 };
 
-const _ = chrome.i18n.getMessage.bind(chrome.i18n);
+const api = typeof browser !== 'undefined' ? browser : chrome;
+const _ = api.i18n.getMessage.bind(api.i18n);
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -72,7 +73,7 @@ const btnReset = $('btnReset');
 // ── Load saved config ─────────────────────────────────────────────
 
 function loadConfig() {
-  chrome.storage.local.get(Object.keys(DEFAULTS), (data) => {
+  api.storage.local.get(Object.keys(DEFAULTS), (data) => {
     proxyHost.value = data.proxyHost || DEFAULTS.proxyHost;
     proxyPort.value = data.proxyPort || DEFAULTS.proxyPort;
     proxyUser.value = data.proxyUser || DEFAULTS.proxyUser;
@@ -120,7 +121,7 @@ function saveConfig(e) {
     return;
   }
 
-  chrome.storage.local.set(
+  api.storage.local.set(
     {
       proxyHost: host,
       proxyPort: port,
@@ -131,8 +132,8 @@ function saveConfig(e) {
       proxyPass: pass,
     },
     () => {
-      if (chrome.runtime.lastError) {
-        showStatus(_('msgSaveFail') + ': ' + chrome.runtime.lastError.message, 'error');
+      if (api.runtime.lastError) {
+        showStatus(_('msgSaveFail') + ': ' + api.runtime.lastError.message, 'error');
       } else {
         showStatus(_('msgSaveSuccess'), 'success');
       }
@@ -143,7 +144,7 @@ function saveConfig(e) {
 // ── Reset to defaults ─────────────────────────────────────────────
 
 function resetConfig() {
-  chrome.storage.local.set(DEFAULTS, () => {
+  api.storage.local.set(DEFAULTS, () => {
     loadConfig();
     showStatus(_('msgResetDone'), 'success');
   });

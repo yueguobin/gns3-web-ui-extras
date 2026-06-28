@@ -1,6 +1,7 @@
 // i18n helper — apply chrome.i18n messages to HTML elements
 (function () {
-  const _ = chrome.i18n.getMessage.bind(chrome.i18n);
+  const api = typeof browser !== 'undefined' ? browser : chrome;
+  const _ = api.i18n.getMessage.bind(api.i18n);
 
   // Replace localised text in the current page
   document.querySelectorAll('[data-i18n]').forEach((el) => {

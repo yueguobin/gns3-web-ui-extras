@@ -1,4 +1,11 @@
-// GNS3 Management Proxy — Background Service Worker (MV3)
+// GNS3 Management Proxy — Background Service Worker / Event Page (MV3)
+// Compatible with both Chrome and Firefox.
+
+// ── Browser compatibility shim ────────────────────────────────────
+// Firefox exposes the global `browser`; Chrome exposes `chrome`.
+// Use whichever is available so one file runs in both.
+const api = typeof browser !== 'undefined' ? browser : chrome;
+const isFirefox = typeof browser !== 'undefined';
 
 const DEFAULT_CONFIG = {
   proxyHost: '127.0.0.1',
@@ -38,12 +45,19 @@ function buildPacScript(host, port, network, mask) {
 }
 
 // ── Apply proxy settings ──────────────────────────────────────────
+// Chrome uses `mode: "pac_script"` with inline `pacScript.data`.
+// Firefox uses `proxyType: "autoConfig"` with a `data:` URL for the PAC.
 
 function applyProxy(config) {
   const { proxyHost, proxyPort, mgmtNetwork, mgmtMask, enabled } = config;
 
+  if (isFirefox) {
+    applyProxyFirefox(config);
+    return;
+  }
+
   if (!enabled) {
-    chrome.proxy.settings.set(
+    api.proxy.settings.set(
       { value: { mode: 'direct' }, scope: 'regular' },
       () => console.log('[GNS3 Proxy] Disabled, set to DIRECT'),
     );
@@ -52,7 +66,7 @@ function applyProxy(config) {
 
   const pacScript = buildPacScript(proxyHost, proxyPort, mgmtNetwork, mgmtMask);
 
-  chrome.proxy.settings.set(
+  api.proxy.settings.set(
     {
       value: {
         mode: 'pac_script',
@@ -61,8 +75,8 @@ function applyProxy(config) {
       scope: 'regular',
     },
     () => {
-      if (chrome.runtime.lastError) {
-        console.error('[GNS3 Proxy] Failed to set PAC:', chrome.runtime.lastError);
+      if (api.runtime.lastError) {
+        console.error('[GNS3 Proxy] Failed to set PAC:', api.runtime.lastError);
       } else {
         console.log(`[GNS3 Proxy] PAC applied: ${mgmtNetwork}/${mgmtMask} → ${proxyHost}:${proxyPort}`);
       }
@@ -70,36 +84,80 @@ function applyProxy(config) {
   );
 }
 
+// Firefox path — proxy.settings uses proxyType + autoConfigUrl.
+function applyProxyFirefox(config) {
+  const { proxyHost, proxyPort, mgmtNetwork, mgmtMask, enabled } = config;
+
+  if (!enabled) {
+    api.proxy.settings.set({ value: { proxyType: 'none' } });
+    console.log('[GNS3 Proxy] Disabled, set to NONE (Firefox)');
+    return;
+  }
+
+  const pacScript = buildPacScript(proxyHost, proxyPort, mgmtNetwork, mgmtMask);
+  const autoConfigUrl = 'data:text/javascript,' + encodeURIComponent(pacScript);
+
+  api.proxy.settings.set({
+    value: { proxyType: 'autoConfig', autoConfigUrl },
+  });
+  console.log(`[GNS3 Proxy] PAC applied (Firefox): ${mgmtNetwork}/${mgmtMask} → ${proxyHost}:${proxyPort}`);
+}
+
 // ── Auth handler (proxy CONNECT authentication) ─────────────────────
+// Chrome uses asyncBlocking (callback-style).
+// Firefox uses blocking mode and returns the value directly.
 
-chrome.webRequest.onAuthRequired.addListener(
-  (details, callback) => {
-    if (!details.isProxy) {
-      callback();
-      return;
-    }
+function handleAuth(details) {
+  if (!details.isProxy) {
+    return isFirefox ? {} : undefined;
+  }
 
-    chrome.storage.local.get(['proxyUser', 'proxyPass'], (data) => {
-      const user = data.proxyUser || currentConfig.proxyUser || 'admin';
-      const pass = data.proxyPass || currentConfig.proxyPass || '';
-      callback({
-        authCredentials: { username: user, password: pass },
+  // For Chrome async path we need async storage access; handled in listener below.
+  // Firefox is synchronous-friendly with blocking, but storage may still be async,
+  // so we read from the cached currentConfig instead.
+  const user = currentConfig.proxyUser || 'admin';
+  const pass = currentConfig.proxyPass || '';
+  return { authCredentials: { username: user, password: pass } };
+}
+
+if (isFirefox) {
+  // Firefox: blocking listener. Reads from currentConfig (kept in sync via storage.onChanged).
+  api.webRequest.onAuthRequired.addListener(
+    (details) => handleAuth(details),
+    { urls: ['<all_urls>'] },
+    ['blocking'],
+  );
+} else {
+  // Chrome: asyncBlocking with callback.
+  api.webRequest.onAuthRequired.addListener(
+    (details, callback) => {
+      if (!details.isProxy) {
+        callback();
+        return;
+      }
+
+      api.storage.local.get(['proxyUser', 'proxyPass'], (data) => {
+        const user = data.proxyUser || currentConfig.proxyUser || 'admin';
+        const pass = data.proxyPass || currentConfig.proxyPass || '';
+        callback({
+          authCredentials: { username: user, password: pass },
+        });
       });
-    });
 
-    // Return true to indicate async callback (required for asyncBlocking)
-    return true;
-  },
-  { urls: ['<all_urls>'] },
-  ['asyncBlocking'],
-);
+      // Return true to indicate async callback (required for asyncBlocking)
+      return true;
+    },
+    { urls: ['<all_urls>'] },
+    ['asyncBlocking'],
+  );
+}
 
 // ── Load config from storage and apply ─────────────────────────────
 
 function loadAndApplyConfig() {
-  chrome.storage.local.get(null, (stored) => {
-    if (chrome.runtime.lastError) {
-      console.error('[GNS3 Proxy] Storage read error:', chrome.runtime.lastError);
+  api.storage.local.get(null, (stored) => {
+    if (api.runtime.lastError) {
+      console.error('[GNS3 Proxy] Storage read error:', api.runtime.lastError);
     }
 
     // Merge stored values into defaults
@@ -120,7 +178,7 @@ function loadAndApplyConfig() {
 
 // ── Watch for config changes from options page ─────────────────────
 
-chrome.storage.onChanged.addListener((changes, area) => {
+api.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
 
   let changed = false;
@@ -149,12 +207,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // ── Installation & runtime events ─────────────────────────────────
 
-chrome.runtime.onInstalled.addListener(({ reason }) => {
+api.runtime.onInstalled.addListener(({ reason }) => {
   console.log(`[GNS3 Proxy] Installed, reason: ${reason}`);
   loadAndApplyConfig();
 });
 
-chrome.runtime.onStartup.addListener(() => {
+api.runtime.onStartup.addListener(() => {
   console.log('[GNS3 Proxy] Browser startup');
   loadAndApplyConfig();
 });
