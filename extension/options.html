@@ -39,14 +39,9 @@
         <legend data-i18n="sectionNetwork">Management Network</legend>
 
         <div class="field">
-          <label for="mgmtCidr" data-i18n="fieldCidr">CIDR Network</label>
-          <input type="text" id="mgmtCidr" data-i18n-attr="placeholder" data-i18n="phCidr" />
+          <label for="mgmtCidrs" data-i18n="fieldCidr">CIDR Network</label>
+          <textarea id="mgmtCidrs" rows="4" data-i18n-attr="placeholder" data-i18n="phCidr"></textarea>
           <span class="hint" data-i18n="hintCidr">Format: network/prefix (e.g. 172.16.40.0/23)</span>
-        </div>
-
-        <div class="field readonly">
-          <label data-i18n="fieldMask">Subnet Mask</label>
-          <span id="maskDisplay">—</span>
         </div>
       </fieldset>
 

@@ -53,3 +53,4 @@ with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
 PYEOF
 
 echo "✓ Built: $ZIP"
+echo "✓ Unpacked: $PKG  (load this folder for temporary install)"

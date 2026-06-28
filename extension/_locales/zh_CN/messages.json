@@ -14,18 +14,17 @@
   "fieldServerAddr":            { "message": "Server 地址" },
   "fieldPort":                  { "message": "代理端口" },
   "fieldCidr":                  { "message": "CIDR 网段" },
-  "fieldMask":                  { "message": "子网掩码" },
   "fieldUsername":              { "message": "用户名" },
   "fieldPassword":              { "message": "密码" },
 
   "hintServerAddr":             { "message": "gns3server 的主机名或 IP 地址" },
   "hintPort":                   { "message": "CONNECT 代理端口，默认 3090" },
-  "hintCidr":                   { "message": "格式：网络地址/前缀长度（如 172.16.40.0/23），仅此段 IP 走代理" },
+  "hintCidr":                   { "message": "每行一个 CIDR。如 172.16.40.0/23、10.0.0.0/24、或 192.168.1.100/32" },
   "hintPassword":               { "message": "密码保存在浏览器本地存储中" },
 
   "phServerAddr":               { "message": "127.0.0.1" },
   "phPort":                     { "message": "3090" },
-  "phCidr":                     { "message": "172.16.40.0/23" },
+  "phCidr":                     { "message": "172.16.40.0/23\n10.0.0.0/24" },
   "phUsername":                 { "message": "admin" },
   "phPassword":                 { "message": "输入密码" },
 
@@ -40,7 +39,7 @@
   "actionDisable":              { "message": "禁用代理" },
 
   "labelProxyTarget":           { "message": "代理目标" },
-  "labelMgmtNetwork":           { "message": "管理网段" },
+  "labelMgmtNetwork":           { "message": "子网" },
 
   "footerNote":                 { "message": "仅管理网段内 IP 走代理，不影响正常上网。" },
 
@@ -48,7 +47,7 @@
 
   "errServerEmpty":             { "message": "Server 地址不能为空" },
   "errPortRange":               { "message": "端口需在 1-65535 之间" },
-  "errCidrFormat":              { "message": "管理网段格式不正确（例: 172.16.40.0/23）" },
+  "errCidrFormat":              { "message": "CIDR 格式不正确（例: 172.16.40.0/23），每行一个" },
   "errUserEmpty":               { "message": "用户名不能为空" },
 
   "msgSaveSuccess":             { "message": "配置已保存，代理规则已更新。" },

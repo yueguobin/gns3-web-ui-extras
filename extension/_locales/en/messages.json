@@ -14,18 +14,17 @@
   "fieldServerAddr":            { "message": "Server Address" },
   "fieldPort":                  { "message": "Proxy Port" },
   "fieldCidr":                  { "message": "CIDR Network" },
-  "fieldMask":                  { "message": "Subnet Mask" },
   "fieldUsername":              { "message": "Username" },
   "fieldPassword":              { "message": "Password" },
 
   "hintServerAddr":             { "message": "Hostname or IP of the gns3server" },
   "hintPort":                   { "message": "CONNECT proxy port, default 3090" },
-  "hintCidr":                   { "message": "Format: network/prefix (e.g. 172.16.40.0/23). Only this subnet uses the proxy" },
+  "hintCidr":                   { "message": "One CIDR per line. Examples: 172.16.40.0/23, 10.0.0.0/24, or 192.168.1.100/32" },
   "hintPassword":               { "message": "Password is stored in browser local storage" },
 
   "phServerAddr":               { "message": "127.0.0.1" },
   "phPort":                     { "message": "3090" },
-  "phCidr":                     { "message": "172.16.40.0/23" },
+  "phCidr":                     { "message": "172.16.40.0/23\n10.0.0.0/24" },
   "phUsername":                 { "message": "admin" },
   "phPassword":                 { "message": "Enter password" },
 
@@ -48,7 +47,7 @@
 
   "errServerEmpty":             { "message": "Server address cannot be empty" },
   "errPortRange":               { "message": "Port must be between 1 and 65535" },
-  "errCidrFormat":              { "message": "Invalid CIDR format (e.g. 172.16.40.0/23)" },
+  "errCidrFormat":              { "message": "Invalid CIDR format (e.g. 172.16.40.0/23), one per line" },
   "errUserEmpty":               { "message": "Username cannot be empty" },
 
   "msgSaveSuccess":             { "message": "Settings saved. Proxy rules updated." },

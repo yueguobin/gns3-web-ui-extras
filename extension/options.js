@@ -3,9 +3,7 @@
 const DEFAULTS = {
   proxyHost: '127.0.0.1',
   proxyPort: 3090,
-  mgmtCidr: '172.16.40.0/23',
-  mgmtNetwork: '172.16.40.0',
-  mgmtMask: '255.255.254.0',
+  mgmtCidrs: ['172.16.40.0/23'],
   proxyUser: 'admin',
   proxyPass: '',
   enabled: false,
@@ -35,13 +33,6 @@ function cidrToMask(prefix) {
   ].join('.');
 }
 
-function maskToCidr(mask) {
-  const parts = String(mask).split('.').map(Number);
-  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return 0;
-  const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-  return Math.clz32((~bin) >>> 0);
-}
-
 /**
  * Parse "172.16.40.0/23" → { network, prefix, mask }
  * Returns null on invalid input.
@@ -56,13 +47,24 @@ function parseCidr(input) {
   return { network, prefix, mask: cidrToMask(prefix) };
 }
 
+/**
+ * Split multi-line text into CIDR array. Returns null if any line is invalid.
+ */
+function parseCidrLines(text) {
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (!lines.length) return [];
+  for (const line of lines) {
+    if (!parseCidr(line)) return null;
+  }
+  return lines;
+}
+
 // ── DOM refs ──────────────────────────────────────────────────────
 
 const $ = (id) => document.getElementById(id);
 const proxyHost = $('proxyHost');
 const proxyPort = $('proxyPort');
-const mgmtCidr = $('mgmtCidr');
-const maskDisplay = $('maskDisplay');
+const mgmtCidrs = $('mgmtCidrs');
 const proxyUser = $('proxyUser');
 const proxyPass = $('proxyPass');
 const btnTogglePass = $('btnTogglePass');
@@ -79,25 +81,10 @@ function loadConfig() {
     proxyUser.value = data.proxyUser || DEFAULTS.proxyUser;
     proxyPass.value = data.proxyPass || '';
 
-    if (data.mgmtCidr && String(data.mgmtCidr).includes('/')) {
-      mgmtCidr.value = data.mgmtCidr;
-    } else {
-      const net = data.mgmtNetwork || DEFAULTS.mgmtNetwork;
-      const pre = data.mgmtCidr || maskToCidr(data.mgmtMask || DEFAULTS.mgmtMask);
-      mgmtCidr.value = `${net}/${pre}`;
-    }
-    updateMaskDisplay();
+    const cidrs = Array.isArray(data.mgmtCidrs) ? data.mgmtCidrs : DEFAULTS.mgmtCidrs;
+    mgmtCidrs.value = cidrs.join('\n');
   });
 }
-
-// ── Update mask display on input ──────────────────────────────────
-
-function updateMaskDisplay() {
-  const parsed = parseCidr(mgmtCidr.value);
-  maskDisplay.textContent = parsed ? parsed.mask : '—';
-}
-
-mgmtCidr.addEventListener('input', updateMaskDisplay);
 
 // ── Save config ───────────────────────────────────────────────────
 
@@ -106,14 +93,14 @@ function saveConfig(e) {
 
   const host = proxyHost.value.trim();
   const port = parseInt(proxyPort.value, 10);
-  const cidrParsed = parseCidr(mgmtCidr.value);
+  const cidrLines = parseCidrLines(mgmtCidrs.value);
   const user = proxyUser.value.trim();
   const pass = proxyPass.value;
 
   const errors = [];
   if (!host) errors.push(_('errServerEmpty'));
   if (isNaN(port) || port < 1 || port > 65535) errors.push(_('errPortRange'));
-  if (!cidrParsed) errors.push(_('errCidrFormat'));
+  if (cidrLines === null) errors.push(_('errCidrFormat'));
   if (!user) errors.push(_('errUserEmpty'));
 
   if (errors.length) {
@@ -125,9 +112,7 @@ function saveConfig(e) {
     {
       proxyHost: host,
       proxyPort: port,
-      mgmtCidr: mgmtCidr.value.trim(),
-      mgmtNetwork: cidrParsed.network,
-      mgmtMask: cidrParsed.mask,
+      mgmtCidrs: cidrLines,
       proxyUser: user,
       proxyPass: pass,
     },

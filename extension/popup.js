@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUI(config) {
     const enabled = !!config.enabled;
+    const count = Array.isArray(config.mgmtCidrs) ? config.mgmtCidrs.length : 1;
 
     statusDot.className = 'status-dot' + (enabled ? ' active' : '');
     statusText.textContent = enabled
@@ -23,30 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
     infoProxy.textContent = enabled
       ? `${config.proxyHost || '127.0.0.1'}:${config.proxyPort || 3090}`
       : '—';
-    infoNetwork.textContent = enabled
-      ? (config.mgmtCidr || `${config.mgmtNetwork}/${maskToCidr(config.mgmtMask)}`)
-      : '—';
-  }
-
-  function maskToCidr(mask) {
-    if (!mask) return '';
-    const parts = String(mask).split('.').map(Number);
-    if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) return '';
-    const bin = (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
-    return bin === 0 ? '0' : String(Math.clz32((~bin) >>> 0));
+    infoNetwork.textContent = enabled ? `${count} entries` : '—';
   }
 
   // Load current config
   api.storage.local.get(
-    ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidr', 'mgmtNetwork', 'mgmtMask'],
+    ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidrs'],
     (data) => {
       updateUI({
         enabled: data.enabled || false,
         proxyHost: data.proxyHost || '127.0.0.1',
         proxyPort: data.proxyPort || 3090,
-        mgmtCidr: data.mgmtCidr,
-        mgmtNetwork: data.mgmtNetwork || '172.16.40.0',
-        mgmtMask: data.mgmtMask || '255.255.254.0',
+        mgmtCidrs: Array.isArray(data.mgmtCidrs) ? data.mgmtCidrs : ['172.16.40.0/23'],
       });
     },
   );
@@ -54,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Toggle proxy
   btnToggle.addEventListener('click', () => {
     api.storage.local.get(
-      ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidr', 'mgmtNetwork', 'mgmtMask'],
+      ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidrs'],
       (data) => {
         const newState = !data.enabled;
         api.storage.local.set({ enabled: newState }, () => {
@@ -62,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             enabled: newState,
             proxyHost: data.proxyHost || '127.0.0.1',
             proxyPort: data.proxyPort || 3090,
-            mgmtCidr: data.mgmtCidr,
-            mgmtNetwork: data.mgmtNetwork || '172.16.40.0',
-            mgmtMask: data.mgmtMask || '255.255.254.0',
+            mgmtCidrs: Array.isArray(data.mgmtCidrs) ? data.mgmtCidrs : ['172.16.40.0/23'],
           });
         });
       },
