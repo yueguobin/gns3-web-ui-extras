@@ -1,7 +1,5 @@
 // GNS3 Management Proxy — Popup
 
-const api = typeof browser !== 'undefined' ? browser : chrome;
-
 document.addEventListener('DOMContentLoaded', () => {
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
@@ -15,11 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     statusDot.className = 'status-dot' + (enabled ? ' active' : '');
     statusText.textContent = enabled
-      ? api.i18n.getMessage('statusEnabled')
-      : api.i18n.getMessage('statusDisabled');
+      ? browser.i18n.getMessage('statusEnabled')
+      : browser.i18n.getMessage('statusDisabled');
     btnToggle.textContent = enabled
-      ? api.i18n.getMessage('actionDisable')
-      : api.i18n.getMessage('actionEnable');
+      ? browser.i18n.getMessage('actionDisable')
+      : browser.i18n.getMessage('actionEnable');
 
     infoProxy.textContent = enabled
       ? `${config.proxyHost || '127.0.0.1'}:${config.proxyPort || 3090}`
@@ -28,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Load current config
-  api.storage.local.get(
+  browser.storage.local.get(
     ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidrs'],
     (data) => {
       updateUI({
@@ -42,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Toggle proxy
   btnToggle.addEventListener('click', () => {
-    api.storage.local.get(
+    browser.storage.local.get(
       ['enabled', 'proxyHost', 'proxyPort', 'mgmtCidrs'],
       (data) => {
         const newState = !data.enabled;
-        api.storage.local.set({ enabled: newState }, () => {
+        browser.storage.local.set({ enabled: newState }, () => {
           updateUI({
             enabled: newState,
             proxyHost: data.proxyHost || '127.0.0.1',

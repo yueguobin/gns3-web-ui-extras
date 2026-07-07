@@ -1,12 +1,6 @@
-// GNS3 Management Proxy — Background Service Worker / Event Page (MV3)
-// Compatible with both Chrome and Firefox.
-//
-// Chrome: PAC script + onAuthRequired (HTTP CONNECT)
-// Firefox: proxy.onRequest → SOCKS5 with auth per-request
-
-// ── Browser compatibility shim ────────────────────────────────────
-const api = typeof browser !== 'undefined' ? browser : chrome;
-const isFirefox = typeof browser !== 'undefined';
+// GNS3 Management Proxy — Background Script (Firefox MV3)
+// Uses browser.proxy.onRequest for per-request SOCKS5 with authentication.
+// No PAC script, no native host — pure extension.
 
 const DEFAULT_CONFIG = {
   proxyHost: '127.0.0.1',
@@ -55,7 +49,7 @@ function parseCidrList(arr) {
   return out;
 }
 
-// ── IP / subnet matching (used by Firefox onRequest) ──────────────
+// ── IP / subnet matching ──────────────────────────────────────────
 
 function ipToInt(ip) {
   return ip.split('.').reduce((acc, oct) => (acc << 8) | parseInt(oct, 10), 0) >>> 0;
@@ -70,65 +64,9 @@ function isHostInNetwork(host, network, mask) {
   return (ipToInt(host) & ipToInt(mask)) === ipToInt(network);
 }
 
-// ── PAC script generation (Chrome only) ───────────────────────────
+// ── Proxy request handler (SOCKS5 with auth) ──────────────────────
 
-function buildPacScript(host, port, entries) {
-  const nets = entries.map((e) => `["${e.network}","${e.mask}"]`).join(',');
-  return `
-    function FindProxyForURL(url, host) {
-      var nets = [${nets}];
-      for (var i = 0; i < nets.length; i++) {
-        if (isInNet(host, nets[i][0], nets[i][1]))
-          return "PROXY ${host}:${port}";
-      }
-      return "DIRECT";
-    }
-  `;
-}
-
-// ── Apply proxy settings (Chrome path) ────────────────────────────
-
-function applyProxyChrome(config) {
-  const { proxyHost, proxyPort, mgmtCidrs, enabled } = config;
-
-  if (!enabled) {
-    api.proxy.settings.set(
-      { value: { mode: 'direct' }, scope: 'regular' },
-      () => console.log('[GNS3 Proxy] Disabled, set to DIRECT'),
-    );
-    return;
-  }
-
-  const entries = parseCidrList(mgmtCidrs);
-  if (!entries.length) {
-    console.error('[GNS3 Proxy] No valid CIDR entries, disabling proxy');
-    api.proxy.settings.set({ value: { mode: 'direct' }, scope: 'regular' });
-    return;
-  }
-
-  const pacScript = buildPacScript(proxyHost, proxyPort, entries);
-
-  api.proxy.settings.set(
-    {
-      value: {
-        mode: 'pac_script',
-        pacScript: { data: pacScript },
-      },
-      scope: 'regular',
-    },
-    () => {
-      if (api.runtime.lastError) {
-        console.error('[GNS3 Proxy] Failed to set PAC:', api.runtime.lastError);
-      } else {
-        console.log(`[GNS3 Proxy] PAC applied: ${entries.length} entries → ${proxyHost}:${proxyPort}`);
-      }
-    },
-  );
-}
-
-// ── Firefox path: proxy.onRequest → SOCKS5 with auth ──────────────
-
-function handleFirefoxProxyRequest(details) {
+function handleProxyRequest(details) {
   if (!currentConfig.enabled) {
     return { type: 'direct' };
   }
@@ -157,61 +95,24 @@ function handleFirefoxProxyRequest(details) {
   return { type: 'direct' };
 }
 
-// ── Apply proxy — dispatch to browser-specific path ───────────────
+// ── Register proxy.onRequest ──────────────────────────────────────
 
-function applyProxy(config) {
-  if (isFirefox) {
-    // Firefox uses proxy.onRequest (registered once at init); no settings to push.
-    console.log('[GNS3 Proxy] State:', config.enabled ? 'enabled' : 'disabled');
-    return;
-  }
-  applyProxyChrome(config);
-}
+browser.proxy.onRequest.addListener(handleProxyRequest, { urls: ['<all_urls>'] });
 
-// ── Auth handler (Chrome only: HTTP CONNECT proxy auth) ───────────
+// ── Load / watch config ───────────────────────────────────────────
 
-if (!isFirefox) {
-  api.webRequest.onAuthRequired.addListener(
-    (details, callback) => {
-      if (!details.isProxy) {
-        callback();
-        return;
-      }
-      api.storage.local.get(['proxyUser', 'proxyPass'], (data) => {
-        const user = data.proxyUser || currentConfig.proxyUser || 'admin';
-        const pass = data.proxyPass || currentConfig.proxyPass || '';
-        callback({ authCredentials: { username: user, password: pass } });
-      });
-      return true;
-    },
-    { urls: ['<all_urls>'] },
-    ['asyncBlocking'],
-  );
-}
-
-// ── Register Firefox proxy.onRequest ──────────────────────────────
-
-if (isFirefox && api.proxy && api.proxy.onRequest) {
-  api.proxy.onRequest.addListener(handleFirefoxProxyRequest, { urls: ['<all_urls>'] });
-}
-
-// ── Load config from storage and apply ─────────────────────────────
-
-function loadAndApplyConfig() {
-  api.storage.local.get(null, (stored) => {
-    if (api.runtime.lastError) {
-      console.error('[GNS3 Proxy] Storage read error:', api.runtime.lastError);
+function loadConfig() {
+  browser.storage.local.get(null, (stored) => {
+    if (browser.runtime.lastError) {
+      console.error('[GNS3 Proxy] Storage read error:', browser.runtime.lastError);
     }
     currentConfig = { ...DEFAULT_CONFIG, ...stored };
-    applyProxy(currentConfig);
+    console.log('[GNS3 Proxy] State:', currentConfig.enabled ? 'enabled' : 'disabled');
   });
 }
 
-// ── Watch for config changes from options page ─────────────────────
-
-api.storage.onChanged.addListener((changes, area) => {
+browser.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
-
   let changed = false;
   for (const key of Object.keys(DEFAULT_CONFIG)) {
     if (changes[key]) {
@@ -219,25 +120,11 @@ api.storage.onChanged.addListener((changes, area) => {
       changed = true;
     }
   }
-
   if (changed) {
-    console.log('[GNS3 Proxy] Config changed, reapplying PAC');
-    applyProxy(currentConfig);
+    console.log('[GNS3 Proxy] Config changed:', currentConfig.enabled ? 'enabled' : 'disabled');
   }
 });
 
-// ── Installation & runtime events ─────────────────────────────────
-
-api.runtime.onInstalled.addListener(({ reason }) => {
-  console.log(`[GNS3 Proxy] Installed, reason: ${reason}`);
-  loadAndApplyConfig();
-});
-
-api.runtime.onStartup.addListener(() => {
-  console.log('[GNS3 Proxy] Browser startup');
-  loadAndApplyConfig();
-});
-
-// ── Initial load ──────────────────────────────────────────────────
-
-loadAndApplyConfig();
+browser.runtime.onInstalled.addListener(() => loadConfig());
+browser.runtime.onStartup.addListener(() => loadConfig());
+loadConfig();

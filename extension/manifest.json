@@ -1,18 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "__MSG_appName__",
+  "name": "GNS3 Management Proxy",
+  "description": "Route traffic to managed device IPs through the GNS3 SOCKS5 proxy",
   "version": "0.0.1",
-  "description": "__MSG_appDesc__",
   "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gns3-management-proxy@gns3.local",
+      "strict_min_version": "115.0"
+    }
+  },
   "permissions": [
     "proxy",
-    "webRequest",
-    "storage",
-    "webRequestAuthProvider"
+    "storage"
   ],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
   },
   "options_ui": {
     "page": "options.html",
