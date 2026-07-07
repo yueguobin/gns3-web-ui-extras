@@ -78,6 +78,7 @@ function handleProxyRequest(details) {
 
     for (const entry of entries) {
       if (isHostInNetwork(host, entry.network, entry.mask)) {
+        console.log(`[GNS3 Proxy] → SOCKS5 ${currentConfig.proxyHost}:${currentConfig.proxyPort}  ${host}`);
         return {
           type: 'socks',
           host: currentConfig.proxyHost,
@@ -92,6 +93,7 @@ function handleProxyRequest(details) {
     // Invalid URL, fall through to direct
   }
 
+  console.log(`[GNS3 Proxy] → DIRECT  ${new URL(details.url).hostname}`);
   return { type: 'direct' };
 }
 
