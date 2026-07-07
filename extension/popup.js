@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     connItems.innerHTML = connections
-      .map((c) => `<div class="conn-row"><span class="conn-host">${c.host}</span><span class="conn-count">${c.count}</span></div>`)
+      .map((host) => `<div class="conn-row"><span class="conn-host">${host}</span></div>`)
       .join('');
   });
 

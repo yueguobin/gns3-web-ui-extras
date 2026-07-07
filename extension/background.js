@@ -65,22 +65,19 @@ function isHostInNetwork(host, network, mask) {
 }
 
 // ── Connection tracking ───────────────────────────────────────────
+// Tracks hosts that have been proxied recently. Entries older than
+// 30 seconds are pruned on each access, so the popup only sees what
+// is currently active.
 
-const connectionLog = new Map(); // host → { host, count, lastSeen }
+const CONN_TTL = 30000; // 30 seconds
+const activeConnections = new Map(); // host → lastSeen (timestamp)
 
 function recordConnection(host) {
   const now = Date.now();
-  const existing = connectionLog.get(host);
-  if (existing) {
-    existing.count++;
-    existing.lastSeen = now;
-  } else {
-    connectionLog.set(host, { host, count: 1, lastSeen: now });
-  }
-  // Keep max 50 entries
-  if (connectionLog.size > 50) {
-    const oldest = [...connectionLog.entries()].sort((a, b) => a[1].lastSeen - b[1].lastSeen)[0];
-    if (oldest) connectionLog.delete(oldest[0]);
+  activeConnections.set(host, now);
+  // Prune stale entries
+  for (const [h, t] of activeConnections) {
+    if (now - t > CONN_TTL) activeConnections.delete(h);
   }
 }
 
@@ -88,10 +85,15 @@ function recordConnection(host) {
 
 browser.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'getConnections') {
-    return Promise.resolve([...connectionLog.values()].sort((a, b) => b.lastSeen - a.lastSeen));
+    const now = Date.now();
+    const active = [...activeConnections.entries()]
+      .filter(([, t]) => now - t <= CONN_TTL)
+      .sort((a, b) => b[1] - a[1])
+      .map(([host]) => host);
+    return Promise.resolve(active);
   }
   if (msg.type === 'clearConnections') {
-    connectionLog.clear();
+    activeConnections.clear();
   }
   return undefined;
 });

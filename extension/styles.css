@@ -195,10 +195,10 @@ html, body {
   color: var(--text-primary);
 }
 
-.conn-count {
-  color: var(--accent);
-  font-weight: 600;
-  margin-left: 8px;
+.conn-host::before {
+  content: '•';
+  color: var(--green);
+  margin-right: 6px;
 }
 
 /* ── Buttons ────────────────────────────────────────────────── */
