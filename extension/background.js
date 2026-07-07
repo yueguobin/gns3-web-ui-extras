@@ -71,11 +71,19 @@ function handleProxyRequest(details) {
     return { type: 'direct' };
   }
 
+  let host = '';
+
   try {
     const url = new URL(details.url);
-    const host = url.hostname;
+    host = url.hostname;
     const entries = parseCidrList(currentConfig.mgmtCidrs);
+    if (entries.length === 0) {
+      console.warn('[GNS3 Proxy] No CIDR entries loaded (mgmtCidrs:', JSON.stringify(currentConfig.mgmtCidrs), ')');
+    }
 
+    if (isIPv4(host)) {
+      console.log(`[GNS3 Proxy]  CHECK ${host} against ${entries.length} entries`);
+    }
     for (const entry of entries) {
       if (isHostInNetwork(host, entry.network, entry.mask)) {
         console.log(`[GNS3 Proxy] → SOCKS5 ${currentConfig.proxyHost}:${currentConfig.proxyPort}  ${host}`);
@@ -91,9 +99,10 @@ function handleProxyRequest(details) {
     }
   } catch (_e) {
     // Invalid URL, fall through to direct
+    host = details.url || 'unknown';
   }
 
-  console.log(`[GNS3 Proxy] → DIRECT  ${new URL(details.url).hostname}`);
+  console.log(`[GNS3 Proxy] → DIRECT  ${host}`);
   return { type: 'direct' };
 }
 
