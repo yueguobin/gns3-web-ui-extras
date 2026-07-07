@@ -82,7 +82,7 @@ function handleProxyRequest(details) {
     }
 
     if (isIPv4(host)) {
-      console.log(`[GNS3 Proxy]  CHECK ${host} against ${entries.length} entries`);
+      console.log(`[GNS3 Proxy]  CHECK ${host} →`, JSON.stringify(currentConfig.mgmtCidrs));
     }
     for (const entry of entries) {
       if (isHostInNetwork(host, entry.network, entry.mask)) {
