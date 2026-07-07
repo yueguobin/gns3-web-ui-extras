@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   );
 
+  // Load connection list
+  const connItems = document.getElementById('connItems');
+  browser.runtime.sendMessage({ type: 'getConnections' }).then((connections) => {
+    if (!connections || connections.length === 0) {
+      connItems.innerHTML = '<span class="conn-empty">—</span>';
+      return;
+    }
+    connItems.innerHTML = connections
+      .map((c) => `<div class="conn-row"><span class="conn-host">${c.host}</span><span class="conn-count">${c.count}</span></div>`)
+      .join('');
+  });
+
   // Toggle proxy
   btnToggle.addEventListener('click', () => {
     browser.storage.local.get(

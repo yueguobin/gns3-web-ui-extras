@@ -64,6 +64,38 @@ function isHostInNetwork(host, network, mask) {
   return ((ipToInt(host) & ipToInt(mask)) >>> 0) === ipToInt(network);
 }
 
+// ── Connection tracking ───────────────────────────────────────────
+
+const connectionLog = new Map(); // host → { host, count, lastSeen }
+
+function recordConnection(host) {
+  const now = Date.now();
+  const existing = connectionLog.get(host);
+  if (existing) {
+    existing.count++;
+    existing.lastSeen = now;
+  } else {
+    connectionLog.set(host, { host, count: 1, lastSeen: now });
+  }
+  // Keep max 50 entries
+  if (connectionLog.size > 50) {
+    const oldest = [...connectionLog.entries()].sort((a, b) => a[1].lastSeen - b[1].lastSeen)[0];
+    if (oldest) connectionLog.delete(oldest[0]);
+  }
+}
+
+// ── Message handler (popup requests connection list) ──────────────
+
+browser.runtime.onMessage.addListener((msg) => {
+  if (msg.type === 'getConnections') {
+    return Promise.resolve([...connectionLog.values()].sort((a, b) => b.lastSeen - a.lastSeen));
+  }
+  if (msg.type === 'clearConnections') {
+    connectionLog.clear();
+  }
+  return undefined;
+});
+
 // ── Proxy request handler (SOCKS5 with auth) ──────────────────────
 
 function handleProxyRequest(details) {
@@ -86,6 +118,7 @@ function handleProxyRequest(details) {
     }
     for (const entry of entries) {
       if (isHostInNetwork(host, entry.network, entry.mask)) {
+        recordConnection(host);
         console.log(`[GNS3 Proxy] → SOCKS5 ${currentConfig.proxyHost}:${currentConfig.proxyPort}  ${host}`);
         return {
           type: 'socks',

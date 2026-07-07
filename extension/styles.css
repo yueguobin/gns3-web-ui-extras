@@ -159,6 +159,48 @@ html, body {
   font-size: 12px;
 }
 
+/* ── Connection list ──────────────────────────────────────────── */
+
+.conn-list {
+  margin-bottom: 12px;
+}
+
+.conn-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.conn-items {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.conn-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.conn-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 12px;
+  font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+}
+
+.conn-host {
+  color: var(--text-primary);
+}
+
+.conn-count {
+  color: var(--accent);
+  font-weight: 600;
+  margin-left: 8px;
+}
+
 /* ── Buttons ────────────────────────────────────────────────── */
 
 .actions {
