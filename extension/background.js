@@ -61,7 +61,7 @@ function isIPv4(s) {
 
 function isHostInNetwork(host, network, mask) {
   if (!isIPv4(host)) return false;
-  return (ipToInt(host) & ipToInt(mask)) === ipToInt(network);
+  return ((ipToInt(host) & ipToInt(mask)) >>> 0) === ipToInt(network);
 }
 
 // ── Proxy request handler (SOCKS5 with auth) ──────────────────────
