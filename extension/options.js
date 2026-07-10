@@ -137,7 +137,7 @@ function resetConfig() {
 // ── Status message ───────────────────────────────────────────────
 
 function showStatus(msg, type) {
-  saveStatus.innerHTML = msg;
+  saveStatus.textContent = msg;
   saveStatus.className = 'save-status ' + type;
   clearTimeout(showStatus._timer);
   showStatus._timer = setTimeout(() => {

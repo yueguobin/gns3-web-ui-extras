@@ -45,9 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
       connItems.innerHTML = '<span class="conn-empty">—</span>';
       return;
     }
-    connItems.innerHTML = connections
-      .map((host) => `<div class="conn-row"><span class="conn-host">${host}</span></div>`)
-      .join('');
+    connItems.replaceChildren();
+    connections.forEach((host) => {
+      const row = document.createElement('div');
+      row.className = 'conn-row';
+      const span = document.createElement('span');
+      span.className = 'conn-host';
+      span.textContent = host; // safe: textContent escapes any markup in host
+      row.appendChild(span);
+      connItems.appendChild(row);
+    });
   });
 
   // Toggle proxy

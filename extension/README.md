@@ -68,6 +68,64 @@ The UI language follows the browser language (`browser.i18n`; `en` / `zh_CN` are
 4. Open a device page (e.g. `https://172.16.40.2/`) → it should load normally
 5. Open an external address (e.g. `example.com`) → it should connect directly, bypassing the proxy
 
+## Publishing to AMO
+
+Firefox Release/Beta only runs **signed** extensions, so distribution goes
+through [AMO](https://addons.mozilla.org/) (addons.mozilla.org). The extension
+ID (`gns3-management-proxy@gns3.local`) and `strict_min_version` are already set
+in the manifest.
+
+### Pre-flight checks
+
+```bash
+cd extension/
+./build.sh                       # → dist/gns3-proxy-firefox-<version>.zip
+npx web-ext lint                 # must report 0 errors before submitting
+```
+
+Bump `version` in `manifest.json` for every new submission — AMO rejects a
+version that already exists.
+
+### Option A — Listed (AMO store, recommended)
+
+1. Sign in at <https://addons.mozilla.org/> and open
+   <https://addons.mozilla.org/developers/>.
+2. **Submit a New Add-on** → **On this site**.
+3. Upload `dist/gns3-proxy-firefox-<version>.zip`.
+4. Fill in the listing: summary, detailed description, screenshots, category,
+   and a **privacy policy URL** (point it at [`../PRIVACY.md`](../PRIVACY.md)).
+5. Submit for review. Once approved, the extension is listed, hosted, and
+   auto-updated by AMO.
+
+### Option B — Unlisted (self-hosted, signed)
+
+1. On <https://addons.mozilla.org/developers/>, generate an **API Key** and
+   **API Secret** (JWT issuer/secret).
+2. Sign a self-hostable build:
+
+   ```bash
+   cd extension/
+   npx web-ext sign \
+     --api-key YOUR_JWT_ISSUER \
+     --api-secret YOUR_JWT_SECRET \
+     --channel unlisted
+   ```
+
+3. Distribute the resulting `web-ext-artifacts/*.xpi` from your own site. AMO
+   still signs it and can serve automatic updates.
+
+### Review notes
+
+- The `proxy` permission is sensitive; reviewers will ask exactly what it is
+  used for. Explain the per-request SOCKS5 routing clearly in the listing.
+- `web-ext lint` may warn about `innerHTML` assignments in `i18n.js`,
+  `options.js`, and `popup.js` (used to apply translated strings). These come
+  from the extension's own bundled locale files, not from user input, but
+  expect reviewers to scrutinize them — switching to `textContent` removes the
+  warning.
+- A privacy policy is required. A ready-made one lives at
+  [`../PRIVACY.md`](../PRIVACY.md).
+
 ## Project structure
 
 ```
