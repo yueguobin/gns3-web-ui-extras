@@ -19,7 +19,7 @@ rm -rf "$PKG"
 mkdir -p "$PKG"
 
 cp -r _locales background.js i18n.js icons popup.html popup.js \
-      options.html options.js styles.css manifest.json "$PKG/" 2>/dev/null || true
+      options.html options.js styles.css manifest.json totp.js "$PKG/" 2>/dev/null || true
 
 rm -f "$ZIP"
 python3 - "$PKG" "$ZIP" <<'PYEOF'

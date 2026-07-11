@@ -7,15 +7,18 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "gns3-management-proxy@gns3.local",
-      "strict_min_version": "115.0"
+      "strict_min_version": "128.0"
     }
   },
   "permissions": [
     "proxy",
     "storage"
   ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["totp.js", "background.js"]
   },
   "options_ui": {
     "page": "options.html",

@@ -52,5 +52,24 @@
 
   "msgSaveSuccess":             { "message": "Settings saved. Proxy rules updated." },
   "msgSaveFail":                { "message": "Save failed" },
-  "msgResetDone":               { "message": "Defaults restored." }
+  "msgResetDone":               { "message": "Defaults restored." },
+
+  "sectionTotp": { "message": "TOTP Binding" },
+  "sectionTotpDesc": { "message": "Bind a TOTP secret so the SOCKS5 password rotates every 30s. The controller API shares the Server Address above." },
+  "fieldControllerPort": { "message": "Controller API Port" },
+  "hintControllerPort": { "message": "GNS3 controller API port, default 3080 (separate from the SOCKS5 port)" },
+  "phControllerPort": { "message": "3080" },
+  "btnBindTotp": { "message": "Bind TOTP" },
+  "btnUnbindTotp": { "message": "Unbind" },
+  "labelTotpBound": { "message": "Bound — proxy password rotates every 30s" },
+  "labelTotpUnbound": { "message": "Not bound (static password in use)" },
+  "errControllerPortRange": { "message": "Controller port must be between 1 and 65535" },
+  "errLoginFail": { "message": "Login failed (wrong username or password)" },
+  "errPermissionDenied": { "message": "Permission to access the GNS3 controller was denied" },
+  "errConnectFail": { "message": "Could not reach the controller. If it uses HTTPS with a self-signed certificate, accept it in the page that just opened, then click Bind again." },
+  "msgBindSuccess": { "message": "TOTP bound. Proxy password now rotates every 30s." },
+  "msgBindFail": { "message": "Binding failed" },
+  "msgUnbindSuccess": { "message": "TOTP unbound. Reverted to static password." },
+  "msgUnbindFail": { "message": "Unbind failed" },
+  "msgAlreadyBound": { "message": "Already bound — unbind first to re-bind" }
 }

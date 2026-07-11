@@ -52,5 +52,24 @@
 
   "msgSaveSuccess":             { "message": "配置已保存，代理规则已更新。" },
   "msgSaveFail":                { "message": "保存失败" },
-  "msgResetDone":               { "message": "已恢复默认配置。" }
+  "msgResetDone":               { "message": "已恢复默认配置。" },
+
+  "sectionTotp": { "message": "TOTP 绑定" },
+  "sectionTotpDesc": { "message": "绑定 TOTP 密钥后，SOCKS5 密码每 30 秒自动轮换。Controller API 与上方的服务器地址共用。" },
+  "fieldControllerPort": { "message": "Controller API 端口" },
+  "hintControllerPort": { "message": "GNS3 controller API 端口，默认 3080（与上方 SOCKS5 端口不同）" },
+  "phControllerPort": { "message": "3080" },
+  "btnBindTotp": { "message": "绑定 TOTP" },
+  "btnUnbindTotp": { "message": "解绑" },
+  "labelTotpBound": { "message": "已绑定 — 代理密码每 30 秒轮换" },
+  "labelTotpUnbound": { "message": "未绑定（使用静态密码）" },
+  "errControllerPortRange": { "message": "Controller 端口需在 1-65535 之间" },
+  "errLoginFail": { "message": "登录失败（用户名或密码错误）" },
+  "errPermissionDenied": { "message": "访问 GNS3 controller 的权限被拒绝" },
+  "errConnectFail": { "message": "无法连接 Controller。若使用自签名 HTTPS 证书，请在刚打开的页面接受证书后，重新点击绑定。" },
+  "msgBindSuccess": { "message": "TOTP 已绑定，代理密码每 30 秒轮换。" },
+  "msgBindFail": { "message": "绑定失败" },
+  "msgUnbindSuccess": { "message": "已解绑 TOTP，回退到静态密码。" },
+  "msgUnbindFail": { "message": "解绑失败" },
+  "msgAlreadyBound": { "message": "已绑定，请先解绑再重新绑定" }
 }

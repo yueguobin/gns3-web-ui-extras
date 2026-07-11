@@ -8,6 +8,9 @@ const DEFAULT_CONFIG = {
   mgmtCidrs: ['172.16.40.0/23'],
   proxyUser: 'admin',
   proxyPass: '',
+  controllerPort: 3080,
+  controllerProtocol: '',
+  totpSecret: '',
   enabled: false,
 };
 
@@ -121,13 +124,18 @@ function handleProxyRequest(details) {
     for (const entry of entries) {
       if (isHostInNetwork(host, entry.network, entry.mask)) {
         recordConnection(host);
+        // TOTP-bound: rotate the SOCKS5 password every 30s. Falls back to
+        // the static proxyPass for users who haven't bound a TOTP secret.
+        const password = currentConfig.totpSecret
+          ? 'totp:' + totpNow(currentConfig.totpSecret)
+          : currentConfig.proxyPass || '';
         console.log(`[GNS3 Proxy] → SOCKS5 ${currentConfig.proxyHost}:${currentConfig.proxyPort}  ${host}`);
         return {
           type: 'socks',
           host: currentConfig.proxyHost,
           port: parseInt(currentConfig.proxyPort, 10),
           username: currentConfig.proxyUser || 'admin',
-          password: currentConfig.proxyPass || '',
+          password,
           proxyDNS: true,
         };
       }

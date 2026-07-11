@@ -1,6 +1,6 @@
 # Privacy Policy — GNS3 Management Proxy
 
-_Last updated: 2026-07-10_
+_Last updated: 2026-07-11_
 
 The GNS3 Management Proxy browser extension ("the extension") is designed to
 collect as little information as possible. This page explains what data exists,
@@ -28,6 +28,10 @@ described under "Proxy credentials and traffic" below:
   only to show connection status in the toolbar popup. These expire after a
   short time (about 30 seconds) and are not persisted anywhere outside local
   storage.
+- **TOTP secret** — if you bind TOTP, the shared secret returned by your GNS3
+  controller is stored locally and used to derive a SOCKS5 password that
+  rotates every 30 seconds. The secret itself never leaves your device; only
+  the derived one-time code is sent to your own GNS3 SOCKS5 proxy.
 
 You can erase all of this at any time by removing the extension or by clearing
 the extension's data in your browser.
@@ -48,8 +52,11 @@ response bodies.
 |---|---|
 | `proxy` | Decide, per request, whether to use the SOCKS5 proxy or connect directly. |
 | `storage` | Save your configuration and local connection records on your device. |
+| `optional_host_permissions` | Optional. Requested only when you click **Bind TOTP**, scoped to the GNS3 controller host you configure, and used solely to call that controller's TOTP bind/unbind API. |
 
-The extension intentionally requests **no host permissions**.
+The extension declares **no mandatory host permissions**. An optional host
+permission is requested at runtime — only for your GNS3 controller host, and
+only when you bind or unbind a TOTP secret.
 
 ## Source code
 

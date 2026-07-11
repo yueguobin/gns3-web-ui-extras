@@ -63,6 +63,27 @@
         </div>
       </fieldset>
 
+      <!-- TOTP Binding -->
+      <fieldset>
+        <legend data-i18n="sectionTotp">TOTP Binding</legend>
+        <p class="fieldset-desc" data-i18n="sectionTotpDesc">Bind a TOTP secret so the SOCKS5 password rotates every 30s. The controller API shares the Server Address above.</p>
+
+        <div class="field">
+          <label for="controllerPort" data-i18n="fieldControllerPort">Controller API Port</label>
+          <input type="number" id="controllerPort" data-i18n-attr="placeholder" data-i18n="phControllerPort" min="1" max="65535" />
+          <span class="hint" data-i18n="hintControllerPort">Controller API port, default 3080 (separate from the SOCKS5 port)</span>
+        </div>
+
+        <div class="field">
+          <span class="hint totp-status unbound" id="totpStatus" data-i18n="labelTotpUnbound">Not bound</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" id="btnBindTotp" data-i18n="btnBindTotp">Bind TOTP</button>
+          <button type="button" class="btn btn-secondary" id="btnUnbindTotp" data-i18n="btnUnbindTotp">Unbind</button>
+        </div>
+      </fieldset>
+
       <!-- Controls -->
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" data-i18n="btnSave">Save Settings</button>
